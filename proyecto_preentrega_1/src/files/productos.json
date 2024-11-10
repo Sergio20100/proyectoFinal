@@ -1,0 +1,45 @@
+[
+	{
+		"id": 1,
+		"title": "pan tajado",
+		"description": " pan para el desayuno BIMBO",
+		"code": "J3B",
+		"price": 5000,
+		"status": true,
+		"stock": 20,
+		"category": "comestible",
+		"thumbnails": [
+			"/img/panTajado.jpg",
+			"/img/panTajado1.jpg",
+			"/img/panTajado3.jpg"
+		]
+	},
+	{
+		"id": 2,
+		"title": "moto G30",
+		"description": " celular marca motorola",
+		"code": "FFFF",
+		"price": 150000,
+		"status": true,
+		"stock": 20,
+		"category": "telefono",
+		"thumbnails": [
+			"/img/motorola.jpg",
+			"/img/motorola22.jpg"
+		]
+	},
+	{
+		"id": 3,
+		"title": "moto G20",
+		"description": " celular marca motorola",
+		"code": "FFFF",
+		"price": 150000,
+		"status": true,
+		"stock": 30,
+		"category": "telefono",
+		"thumbnails": [
+			"/img/motorola.jpg",
+			"/img/motorola22.jpg"
+		]
+	}
+]
