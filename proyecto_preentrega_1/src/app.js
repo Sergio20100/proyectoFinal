@@ -6,7 +6,6 @@ import routerCarts from "./routes/carts.router.js";
 
 // Se crea una instancia de la aplicación Express
 const app = express();
-
 // Se define el puerto en el que el servidor escuchará las solicitudes
 const PORT = 8080;
 

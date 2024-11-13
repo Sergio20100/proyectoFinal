@@ -97,9 +97,9 @@ export default class ProductManager {
                 category,
                 thumbnails,
             } = data;
-            if(!Array.isArray(thumbnails)){
-                throw new ErrorManager("las imagenes no son un array",400)
-            }
+            // if(!Array.isArray(thumbnails)){
+            //     throw new ErrorManager("las imagenes no son un array",400)
+            // }
             const productFound = await this.$findOneById(id);
 
             const product = {
@@ -113,7 +113,7 @@ export default class ProductManager {
                 stock: stock ? Number(stock) : productFound.stock,
                 category: category || productFound.category,
                 // array de strings que contenga las rutas donde estan almacenadas las imagenes del producto
-                thumbnails
+                thumbnails: thumbnails || productFound.thumbnails,
             }
             const index = this.#products.findIndex((item) => item.id === Number(id));
             this.#products[index] = product;

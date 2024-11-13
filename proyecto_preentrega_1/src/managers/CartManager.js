@@ -7,10 +7,8 @@ import ProductManager from "./ProductManager.js";
 export default class CartManager{
     #jsonFilename;
     #carts = [];
-    #productManager;
     constructor(){
         this.#jsonFilename = "carrito.json";
-        this.#productManager = new ProductManager;
     }
 // metodos
 
@@ -33,46 +31,28 @@ export default class CartManager{
          throw new ErrorManager(error.message, error.code);
         }
      }
-    async addProductById(cartID, productID,productToAdd){
+    async addProductById(cartID, productID){
 
         try {
-            const { product, quantity } = productToAdd;
-            if(!product || !quantity){
-                throw new ErrorManager("Faltan datos obligatorios en el formulario",400);
-                }
-            if(Number(productID) !== productToAdd.product){
-                throw new ErrorManager("El id del producto del formulario es diferente del req.params",400)
-            }
-            if(Number(quantity) <= 0){
-                throw new ErrorManager("La cantidad del producto debe ser mayor a cero",400)
-            }
-            const cartFound = await this.$findOneById(cartID);
-            const productFound = await this.#productManager.$findOneById(productID);
-         
-            if(!productFound){
-                throw new ErrorManager("No se encontro el producto en la lista de productos",400);
-            }
             
+            const cartFound = await this.$findOneById(cartID);
             if(!cartFound){
                 throw new ErrorManager("No se encontro el id del carrito",400);
                 }
-            
-            
-            
-         
+         const prouctFoundInCart = cartFound.products.findIndex((item)=> item.product === Number(productID) )
+            // if(productIndexFound < 0){
+            //     throw new ErrorManager("No se encontro el producto en la lista de productos",400);
+            // }
         //  console.log(cartFound);
-         const prouctFoundInCart = cartFound.products.findIndex((item)=>productFound.id === item.product)
          
          if(prouctFoundInCart >= 0){
-            cartFound.products[prouctFoundInCart].quantity+= productToAdd.quantity;
-         }else{
-            
-            cartFound.products.push({product: Number(productFound.id), quantity: productToAdd.quantity});
+            cartFound.products[prouctFoundInCart].quantity++;
+         } else{
+            cartFound.products.push({product: Number(productID), quantity: 1});
          }
          // utilizar funcion update
          
-         
-         const index = this.#carts.findIndex((item)=>item.id === Number(cartFound.id));
+         const index = this.#carts.findIndex((item)=>item.id === Number(cartID));
          this.#carts[index] = cartFound;    
          await writeJsonFile(paths.files, this.#jsonFilename,this.#carts)
          return cartFound;
@@ -85,18 +65,16 @@ export default class CartManager{
 
         try {
             const cartFound = await this.$findOneById(cartID);
-            const productFound = await this.#productManager.$findOneById(productID);
-         
-            if(!productFound){
-                throw new ErrorManager("No se encontro el producto en la lista de productos",400);
-            }
             if(!cartFound){
                 throw new ErrorManager("No se encontro el id del carrito",400);
                 }
+            const prouctFoundInCart = cartFound.products.findIndex((item)=> item.product === Number(productID) )
+
+            // const productFound = await this.#productManager.$findOneById(productID);
+            // if(!productFound){
+            //     throw new ErrorManager("No se encontro el producto en la lista de productos",400);
+            // }         
             
-        //  console.log(cartFound);
-         const prouctFoundInCart = cartFound.products.findIndex((item)=>productFound.id === item.product)
-         
          if(prouctFoundInCart >= 0){
             const productRemoved = cartFound.products.splice(prouctFoundInCart,1);
             const index = this.#carts.findIndex((item)=>item.id === Number(cartFound.id));
@@ -124,10 +102,6 @@ export default class CartManager{
         const products = data?.products?.map((item)=>{
             return {product: Number(item.product), quantity: 1}
         })
-        if(!products){
-            throw new ErrorManager("faltan datos obligatrios", 400)
-        }
-
         const cart = {
             id: generateId( await this.getAll() ),
             // title,
