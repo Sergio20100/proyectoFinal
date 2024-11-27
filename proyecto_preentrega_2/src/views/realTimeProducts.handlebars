@@ -1,0 +1,64 @@
+<div class="container-md">
+    <header>
+        <h1>INICIO - Productos en Tiempo Real</h1>
+    </header>
+
+    <main>
+        <section>
+            <h3>Productos</h3>
+            {{!-- Uso de nomenclatura BEM (B de bloque, E de elemento y M de modificador)--}}
+            <div class="products">
+                <div class="p-1 m-1">
+                    {{!-- <ul class="products__list__item" id="products-list"></ul> --}}
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#ID</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Descripcion</th>
+                                <th scope="col">Identificador</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Unidades</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-list">
+                           
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h3>Formulario de Productos</h3>
+            <form class="products__form" id="products-form">
+                <input type="text" name="title" placeholder="Nombre del producto">
+                <input type="text" name="description" placeholder="Descripcion del producto">
+                <input type="text" name="code" placeholder="Codigo identificador del producto">
+                <input type="number" name="price" min="0" placeholder="Precio del producto">
+                <input type="text" name="category" placeholder="Categoria del producto">
+                <div>Estado: Activo<input type="checkbox" name="status"></div>
+                <input type="number" min="0" name="stock" placeholder="Unidades en almacenamiento">
+
+                <input type="submit" value="Guardar" style="width: 100%">
+            </form>
+        </section>
+
+        <section>
+            <h3>Eliminación de Productos</h3>
+            <div class="products__delete">
+                <input type="number" class="products__delete__input" id="input-product-id"
+                    placeholder="ID del Producto">
+                <button id="btn-delete-product">Eliminar</button>
+            </div>
+        </section>
+
+        <p class="error-message" id="error-message"></p>
+    </main>
+
+</div>
+{{!-- El script de socket.io debe estar antes que home.js --}}
+<script src="/socket.io/socket.io.js"></script>
+<script src="/api/public/js/products.socket.js"></script>
