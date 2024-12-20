@@ -29,7 +29,9 @@ export const config = (httpServer) => {
 
         socket.on("delete-product", async (data) => {
             try {
-                await productManager.deleteOneById(Number(data.id));
+                
+                
+                await productManager.deleteOneById(data.id);
 
                 // Envía la lista de productos actualizada después de insertar
                 socketServer.emit("products-list", { products: await productManager.getAll() });

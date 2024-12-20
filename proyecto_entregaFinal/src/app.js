@@ -1,7 +1,7 @@
 import express from "express";
 import { config as configHandlebars } from "./config/handlebars.config.js";
 import { config as configWebsocket } from "./config/websocket.config.js";
-
+import { connectDB } from "./config/mongoose.config.js";
 // Importación de enrutadores
 import routerProducts from "./routes/products.router.js";
 import routerCarts from "./routes/carts.router.js";
@@ -11,6 +11,8 @@ const app = express();
 // Se define el puerto en el que el servidor escuchará las solicitudes
 const PORT = 8080;
 
+// Conexion con Mongo Atlas
+connectDB();
 // Declaración de archivos estáticos desde la carpeta 'public'
 // en la ruta 'http://localhost:8080/api/public'
 app.use("/api/public", express.static("./src/public"));

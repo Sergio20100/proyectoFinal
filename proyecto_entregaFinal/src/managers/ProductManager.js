@@ -1,137 +1,111 @@
-import { generateId } from "../utils/collectionHandler.js";
-import { convertToBool } from "../utils/converter.js";
-import { readJsonFile, writeJsonFile } from "../utils/fileHandler.js";
-import paths from "../utils/paths.js";
+
+
+import { isValidID } from "../config/mongoose.config.js";
+import productModel from "../models/product.model.js";
+import { convertToBool } from "../utils/converter.js"
 import ErrorManager from "./ErrorManager.js";
+
+
 export default class ProductManager {
-    #jsonFilename;
-    #products = [];
+    #productModel;
     constructor() {
-        this.#jsonFilename = "productos.json";
+        this.#productModel = productModel;
     }
     // metodos
 
-    async $findOneById(id) {
-        this.#products = await this.getAll();
-        const productFound = this.#products.find((item) => item.id === Number(id))
+    async #findOneById(id) {
+        if(!isValidID(id)){
+            throw ErrorManager("ID invalido",400);
+        }
 
-        if (!productFound) {
-            throw new ErrorManager("Id del producto no encontrado", 404);
-        } else {
-            return productFound
+        const product = await this.#productModel.findById(id);
+        if(!product){
+            throw ErrorManager("ID no encontrado",404);
+        }
+        return product;
+    }
+
+    async getAll(params){
+        try {
+            const $and = [];
+            
+            if(params?.title) $and.push( {title:{$regex: params.title, $options:"i"} });
+            const filters = $and.length > 0 ? { $and } : {};
+
+            const sort = {
+                asc: { title: 1},
+                desc: { title: -1},
+            };
+
+            const paginationOptions = {
+                limit: params?.limit || 10, // el numero de documentos por defecto 
+                page: params?.page || 1, // pagina actual por defecto,
+                sort: sort[params?.sort] ?? {}, // Ordenamiento (sin orden por defecto)
+                lean: true, // Convertir los resultados en objetos planos
+            }
+
+            return await this.#productModel.paginate(filters, paginationOptions);
+        } catch (error) {
+            throw ErrorManager.handleError(error);
         }
     }
     async getOneById(id) {
 
         try {
-            const productFound = await this.$findOneById(id);
-            return productFound;
+            return await this.#findOneById(id);
         } catch (error) {
-            throw new ErrorManager(error.message, error.code)
+            throw ErrorManager.handleError(error)
         }
     }
-    async getAll() {
-        try {
-            this.#products = await readJsonFile(paths.files, this.#jsonFilename);
-            return this.#products;
-        } catch (error) {
-            throw new ErrorManager(error.message, error.code)
-        }
-    }
-
+    
+    /**
+     * @description Inserta un producto en la DB
+     * @param {*} data 
+     * @returns product
+     */
     async insertOne(data) {
         try {
-            const {
-                title,
-                description,
-                code,
-                price,
-                status,
-                stock,
-                category,
-                thumbnails,
-            } = data;
-
-            if (
-                !title ||
-                !description ||
-                !code ||
-                !price ||
-                !status ||
-                !stock ||
-                !category
-            ) {
-                throw new ErrorManager("faltan datos obligatrios", 400);
-            }
-
-            const product = {
-                id: generateId(await this.getAll()),
-                title,
-                description,
-                code,
-                price: Number(price),
-                status,
-                stock: Number(stock),
-                category,
-                thumbnails: thumbnails || [], // array de strings que contenga las rutas donde estan almacenadas las imagenes del producto
-
-            }
-            this.#products.push(product);
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#products)
+            const product = await this.#productModel.create({...data, status: convertToBool(data.status),})
             return product;
         } catch (error) {
-            throw new ErrorManager(error.message, error.code);
+            throw ErrorManager.handleError(error);
         }
     }
 
+    /**
+     * @description Actualiza un producto por su ID
+     * @param {*} id 
+     * @param {*} data 
+     * @returns 
+     */
     async updateOneById(id, data) {
         try {
-            const {
-                title,
-                description,
-                code,
-                price,
-                status,
-                stock,
-                category,
-                thumbnails,
-            } = data;
-            // if(!Array.isArray(thumbnails)){
-            //     throw new ErrorManager("las imagenes no son un array",400)
-            // }
-            const productFound = await this.$findOneById(id);
-
-            const product = {
-                id: productFound.id,
-                title: title || productFound.title,
-                description: description || productFound.description,
-                code: code || productFound.code,
-                price: price ? Number(price) : productFound.price,
-                status:  status ? convertToBool(status) : productFound.status,
-                // este status viene como string por eso se valida asi
-                stock: stock ? Number(stock) : productFound.stock,
-                category: category || productFound.category,
-                // array de strings que contenga las rutas donde estan almacenadas las imagenes del producto
-                thumbnails: thumbnails || productFound.thumbnails,
+            const product = await this.#findOneById(id)
+            const newValues = {
+                ...product,
+                ...data,
+                status: data.status ? convertToBool(data.status) : product.status,
             }
-            const index = this.#products.findIndex((item) => item.id === Number(id));
-            this.#products[index] = product;
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#products)
+            product.set(newValues);
+            product.save();
+
             return product;
         } catch (error) {
-            throw new ErrorManager(error.message, error.code)
+            throw ErrorManager.handleError(error);
         }
     }
+
+    /**
+     * @description Elimina un producto por su ID
+     * @param {*} id 
+     * @returns 
+     */
     async deleteOneById(id) {
         try {
-            const product = await this.$findOneById(id);
-            // NO SIEMPRE ES NECESARIO RETORNAR EL ELEMENTO ELIMINADO 
-            const index = this.#products.findIndex((item) => item.id === Number(id));
-            this.#products.splice(index, 1);
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#products)
-            return product;
+            const product = await this.#findOneById(id);
+            await product.deleteOne();
         } catch (error) {
-            throw new ErrorManager(error.message, error.code)
+            throw ErrorManager.handleError(error);
         }
     }
 
