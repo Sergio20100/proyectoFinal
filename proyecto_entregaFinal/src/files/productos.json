@@ -1,0 +1,35 @@
+[
+	{
+		"id": 3,
+		"title": "Pan tajado",
+		"description": "pan para el desayuno",
+		"code": "#001",
+		"price": 3000,
+		"status": "on",
+		"stock": 10,
+		"category": "Comida",
+		"thumbnails": []
+	},
+	{
+		"id": 4,
+		"title": "platano",
+		"description": "para comer",
+		"code": "#002",
+		"price": 1000,
+		"status": "on",
+		"stock": 20,
+		"category": "Comida",
+		"thumbnails": []
+	},
+	{
+		"id": 6,
+		"title": "MotoG20",
+		"description": "Celular",
+		"code": "#004",
+		"price": 300000,
+		"status": "on",
+		"stock": 10,
+		"category": "Celulares",
+		"thumbnails": []
+	}
+]
