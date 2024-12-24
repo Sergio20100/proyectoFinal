@@ -8,7 +8,20 @@ const productManager = new ProductManager();
 router.get("/", async (req, res) => {
     try {
         const products = await productManager.getAll(req.query);
-        res.status(200).json({ status: "success", payload:products });
+        
+        const jsonResponse = { 
+                              status: "success", 
+                              payload:products.docs,
+                              limit: products.limit,
+                              totalPages: products.totalPages,
+                              prevPage: products.prevPage,
+                              nextPage: products.nextPage,
+                              page: products.page,
+                              hasNextPage: products.hasNextPage,
+                              hasPrevPage: products.hasNextPage,
+
+                            }
+        res.status(200).json(jsonResponse);
     } catch (error) {
         res.status(error.code || 500).json({status:"error", message: error.message})
     }

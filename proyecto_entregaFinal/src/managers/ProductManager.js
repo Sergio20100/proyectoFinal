@@ -36,7 +36,7 @@ export default class ProductManager {
                 asc: { title: 1},
                 desc: { title: -1},
             };
-
+            // console.log(sort[params?.sort])
             const paginationOptions = {
                 limit: params?.limit || 10, // el numero de documentos por defecto 
                 page: params?.page || 1, // pagina actual por defecto,

@@ -28,13 +28,23 @@ router.get("/:id", async (req, res) => {
         res.status(error.code || 500).json({status:"error", message: error.message})
     }
 });
+router.delete("/:id", async (req, res) => {
+    try {
+        const cart = await cartManager.deleteAllProducts(req.params?.id);
+        res.status(200).json({ status: "success", payload:cart });
+    } catch (error) {
+        res.status(error.code || 500).json({status:"error", message: error.message})
+    }
+});
 
 /**
  * @description Ruta para agregar un carrito
+ * @body {"products":["6769f093d6923c74246c7762","6769f0c8d6923c74246c7768"]} o {"products":[]}  
  */
 router.post("/", async (req, res) => {
     try {
         // console.log(req.body)
+    
         const cart = await cartManager.insertOne(req.body);
         res.status(201).json({ status: "success", payload: cart });
     } catch (error) {
@@ -55,13 +65,23 @@ router.post("/:cid/product/:pid", async (req, res) => {
         res.status(error.code || 500).json({status:"error", message: error.message})
     }
 });
-// router.delete("/:cid/product/:pid", async (req, res) => {
-//     try {
-//         const cart = await cartManager.deleteProductById(req.params?.cid,req.params?.pid);
-//         res.status(201).json({ status: "success", payload: cart });
-//     } catch (error) {
-//         res.status(error.code || 500).json({status:"error", message: error.message})
-//     }
-// });
+router.put("/:cid/product/:pid", async (req, res) => {
+    try {
+        // console.log(req.body)
+        const { quantity } = req.body;
+        const cart = await cartManager.updateOneProductById(req.params?.cid,req.params?.pid,quantity);
+        res.status(201).json({ status: "success", payload: cart });
+    } catch (error) {
+        res.status(error.code || 500).json({status:"error", message: error.message})
+    }
+});
+router.delete("/:cid/product/:pid", async (req, res) => {
+    try {
+        const cart = await cartManager.deleteProductById(req.params?.cid,req.params?.pid);
+        res.status(201).json({ status: "success", payload: cart });
+    } catch (error) {
+        res.status(error.code || 500).json({status:"error", message: error.message})
+    }
+});
 
 export default router;
